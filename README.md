@@ -7,3 +7,5 @@ This code is maintained in a separate, private repository.  Starting with the la
 I hope this may help new Objective-C developers or new SpriteKit developers learn something new.
 
 If you spot any issues or have improvements, please submit a pull request.
+
+Note: This has been updated to work in the current Xcode 7 Beta
