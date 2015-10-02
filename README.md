@@ -8,4 +8,4 @@ I hope this may help new Objective-C developers or new SpriteKit developers lear
 
 If you spot any issues or have improvements, please submit a pull request.
 
-Note: This has been updated to work in the current Xcode 7 Beta
+Note: This requires Xcode 7.0+
