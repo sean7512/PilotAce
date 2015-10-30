@@ -10,23 +10,14 @@
 #import <GameKit/GameKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <Social/Social.h>
+#import <PilotAceSharedFramework/PilotAceSharedFramework.h>
 #import "ViewController.h"
-#import "MainMenuScene.h"
-#import "PauseGameController.h"
-#import "GameCenterController.h"
-#import "PilotAceAppDelegate.h"
 
-@interface ViewController()
+@interface ViewController() <AlertControllerPresenter, MenuHandler>
 
 @property (strong, nonatomic) AVAudioPlayer *themeMusicPlayer;
 
 @end
-
-NSString *const GAME_STARTING_NOTIFICATION = @"gameIsStarting";
-NSString *const GAME_MUSIC_SETTING_CHANGED = @"gameMusicChanged";
-NSString *const GAME_MUSIC_SETTING_KEY = @"gameMusicEnabled";
-NSString *const SHOW_SHARE_SHEET = @"showShareSheet";
-NSString *const SHARE_TEXT_KEY = @"shareText";
 
 @implementation ViewController
 
@@ -54,13 +45,17 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
 
     // only do once...
     if(!skView.scene) {
+        skView.showsFields = NO;
         skView.showsFPS = NO;
         skView.showsNodeCount = NO;
         skView.showsPhysics = NO;
 
+        [GameSettingsController sharedInstance].alertDelegate = self;
+        [GameSettingsController sharedInstance].menuHandlerDelegate = self;
+
         // theme music
         NSError *error;
-        NSURL * backgroundMusicURL = [[NSBundle mainBundle] URLForResource:THEME_MUSIC_FILE withExtension:MUSIC_EXTENSION];
+        NSURL *backgroundMusicURL = [[NSBundle bundleForClass:[MainMenuScene class]] URLForResource:THEME_MUSIC_FILE withExtension:MUSIC_EXTENSION];
         self.themeMusicPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:backgroundMusicURL error:&error];
         if(!self.themeMusicPlayer) {
             NSLog(@"An error occurred while laoding the theme music: %@", error);
@@ -123,8 +118,8 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
 }
 
 - (void)playThemeMusic {
-    PilotAceAppDelegate *appDelegate = (PilotAceAppDelegate *)[[UIApplication sharedApplication] delegate];
-    if((![appDelegate isOtherAudioPlaying]) && [appDelegate isGameMusicEnabled] && self.themeMusicPlayer) {
+    GameSettingsController *gameSettings = [GameSettingsController sharedInstance];
+    if((![gameSettings isOtherAudioPlaying]) && [gameSettings isGameMusicEnabled] && self.themeMusicPlayer) {
         [self.themeMusicPlayer play];
     }
 }
@@ -160,14 +155,25 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
             [self.themeMusicPlayer stop];
             self.themeMusicPlayer = nil;
         }
+    } else {
+        self.themeMusicPlayer = nil;
     }
+}
+
+- (void)setUseNativeMenuHandling:(BOOL)useNativeMenuHandling {
+    // do nothing
 }
 
 - (void)shareText:(NSNotification *)notification {
     NSString *shareText = notification.userInfo[SHARE_TEXT_KEY];
+    SKNode *popOverLocation = (notification.userInfo[SHARE_RECT_KEY]);
     UIImage *img = [UIImage imageNamed:@"iTunesArtwork"];
 
     UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:@[shareText, img] applicationActivities:nil];
+    if(activityVC.popoverPresentationController) {
+        activityVC.popoverPresentationController.sourceView = self.view;
+        activityVC.popoverPresentationController.sourceRect = popOverLocation.frame;
+    }
     activityVC.excludedActivityTypes = @[UIActivityTypePrint, UIActivityTypeAirDrop, UIActivityTypeAssignToContact, UIActivityTypeSaveToCameraRoll];
     [self presentViewController:activityVC animated:YES completion:nil];
 }
@@ -200,11 +206,19 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
 
 - (void)showGCLeaderboard:(NSNotification *)notification {
     if(![GKLocalPlayer localPlayer].isAuthenticated) {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Not Signed In" message:@"You need to sign in to Game Center to view the Leaderboards. Please sign in and try again." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Not Signed In" message:@"You need to sign in to Game Center to view the Leaderboards. Please sign in and try again." preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            // nothing to do
+        }];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
         return;
     }
     [[GameCenterController sharedInstance] displayLeaderBoardWithViewController:self];
+}
+
+- (void)presentAlertController:(UIAlertController *)alertViewController {
+    [self presentViewController:alertViewController animated:YES completion:nil];
 }
 
 @end
