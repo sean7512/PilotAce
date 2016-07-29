@@ -11,7 +11,7 @@
 #import "DifficultyLevel.h"
 #import "AchievementController.h"
 
-@interface GameCenterController()
+@interface GameCenterController() <GKGameCenterControllerDelegate>
 
 @property (strong, nonatomic) NSMutableSet *singleTimeAchievementsEarned;
 
@@ -191,7 +191,7 @@ static NSString *const OSPREY_ACHIEVEMENT_ID = @"pilot_ace_osprey";
                 // show success message
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Congratulations!" message:msg preferredStyle:UIAlertControllerStyleAlert];
                 UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-                    // do nothing
+                    [[NSNotificationCenter defaultCenter] postNotificationName:ALERT_CONTROLLER_DISMISSED object:w_self userInfo:nil];
                 }];
                 [alert addAction:okAction];
                 [[GameSettingsController sharedInstance].alertDelegate presentAlertController:alert];
@@ -236,6 +236,7 @@ static NSString *const OSPREY_ACHIEVEMENT_ID = @"pilot_ace_osprey";
 
 - (void)gameCenterViewControllerDidFinish:(GKGameCenterViewController *)gameCenterViewController {
     [gameCenterViewController dismissViewControllerAnimated:YES completion:NULL];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ALERT_CONTROLLER_DISMISSED object:self userInfo:nil];
 }
 
 - (void)cleanup {

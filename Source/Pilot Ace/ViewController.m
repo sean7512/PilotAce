@@ -207,8 +207,9 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
 - (void)showGCLeaderboard:(NSNotification *)notification {
     if(![GKLocalPlayer localPlayer].isAuthenticated) {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Not Signed In" message:@"You need to sign in to Game Center to view the Leaderboards. Please sign in and try again." preferredStyle:UIAlertControllerStyleAlert];
+        ViewController * __weak w_self = self;
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            // nothing to do
+            [[NSNotificationCenter defaultCenter] postNotificationName:ALERT_CONTROLLER_DISMISSED object:w_self userInfo:nil];
         }];
         [alert addAction:okAction];
         [self presentViewController:alert animated:YES completion:nil];

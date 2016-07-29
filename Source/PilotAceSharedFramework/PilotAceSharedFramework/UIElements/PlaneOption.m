@@ -16,6 +16,7 @@
 @property (strong, nonatomic) SKLabelNode *questionMark;
 @property (strong, nonatomic) NSString *notUnlockedMsg;
 @property (assign, nonatomic) BOOL optionHidden;
+@property (copy, nonatomic) TouchUpInsideCallback alwaysCallback;
 
 @end
 
@@ -23,18 +24,19 @@
 
 static const CGFloat STANDARD_OPTION_HEIGHT = 45;
 
-- (id)initWithPlane:(Airplane *)plane withTouchDownCallback:(TouchUpInsideCallback)callback withNontUnlockedMsg:(NSString *)msg {
+- (id)initWithPlane:(Airplane *)plane withTouchDownCallback:(TouchUpInsideCallback)callback withNontUnlockedMsg:(NSString *)msg withAlwaysTouchDownCallback:(TouchUpInsideCallback)alwaysCallback {
     self = [super initWithTouchUpInsideCallback:callback withTouchDownInsideCallback:NULL];
     if(self) {
         _plane = plane;
         _notUnlockedMsg = msg;
         _optionHidden = NO;
+        _alwaysCallback = alwaysCallback;
     }
     return self;
 }
 
-+ (id)createForPlane:(Airplane *)plane withTouchDownCallback:(TouchDownInsideCallback)callback withNotUnlockedMessage:(NSString *)msg {
-    PlaneOption *option = [[PlaneOption alloc] initWithPlane:plane withTouchDownCallback:callback withNontUnlockedMsg:msg];
++ (id)createForPlane:(Airplane *)plane withTouchDownCallback:(TouchDownInsideCallback)callback withNotUnlockedMessage:(NSString *)msg withAlwaysTouchDownCallback:(TouchUpInsideCallback)alwaysCallback {
+    PlaneOption *option = [[PlaneOption alloc] initWithPlane:plane withTouchDownCallback:callback withNontUnlockedMsg:msg withAlwaysTouchDownCallback:(TouchUpInsideCallback)alwaysCallback];
     [option populate];
     return option;
 }
@@ -76,10 +78,16 @@ static const CGFloat STANDARD_OPTION_HEIGHT = 45;
 }
 
 - (BOOL)shouldFireCallback {
+#warning this (alwaysCallback) should be in shape button
+    if(self.alwaysCallback) {
+        self.alwaysCallback();
+    }
+
     if(self.optionHidden) {
+        PlaneOption * __weak w_self = self;
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Locked" message:self.notUnlockedMsg preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-            // do nothing
+            [[NSNotificationCenter defaultCenter] postNotificationName:ALERT_CONTROLLER_DISMISSED object:w_self userInfo:nil];
         }];
         [alert addAction:okAction];
         [[GameSettingsController sharedInstance].alertDelegate presentAlertController:alert];
@@ -92,6 +100,7 @@ static const CGFloat STANDARD_OPTION_HEIGHT = 45;
     [self.questionMark removeFromParent];
     self.plane = nil;
     self.questionMark = nil;
+    self.alwaysCallback = NULL;
     [super removeFromParent];
 }
 

@@ -14,7 +14,7 @@
 
 @interface PlaneOption : ShapedButton
 
-+ (id)createForPlane:(Airplane *)plane withTouchDownCallback:(TouchUpInsideCallback)callback withNotUnlockedMessage:(NSString *)msg;
++ (id)createForPlane:(Airplane *)plane withTouchDownCallback:(TouchUpInsideCallback)callback withNotUnlockedMessage:(NSString *)msg withAlwaysTouchDownCallback:(TouchUpInsideCallback)alwaysCallback;
 - (void)hideOption;
 
 @end

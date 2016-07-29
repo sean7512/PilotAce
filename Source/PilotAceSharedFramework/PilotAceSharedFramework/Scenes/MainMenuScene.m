@@ -112,6 +112,7 @@
     // leaderboard button
     LabelButton *leaderboardButton = [LabelButton createWithFontNamed:GAME_FONT withTouchEventCallback:^{
         if(w_self) {
+            [w_self cleanupControllerHandlers];
             [[NSNotificationCenter defaultCenter] postNotificationName:DISPLAY_LEADERBOARD_REQUEST object:w_self userInfo:nil];
         }
     }];

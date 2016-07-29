@@ -168,9 +168,15 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
                     return;
                 }
 
-                [sw_self cleanupControllerHandlers];
                 [sw_self startGameForPlane:planeAchievement.planeGenerator() forDifficultyLevel:level];
-            } withNotUnlockedMessage:planeAchievement.howToUnlock];
+            } withNotUnlockedMessage:planeAchievement.howToUnlock withAlwaysTouchDownCallback:^{
+                PlaneChooserScene *sw_self = w_self;
+                if(!sw_self) {
+                    return;
+                }
+
+                [sw_self cleanupControllerHandlers];
+            }];
             [option setScale:nodeScale];
             if(!planeAchievement.unlockChecker()) {
                 // not unlocked

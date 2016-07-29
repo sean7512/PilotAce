@@ -243,8 +243,8 @@ static SKAction *_unpauseSoundAction;
 
 #ifdef TVOS
     if (controller && controller.microGamepad) {
-        [controller.microGamepad.buttonX setValueChangedHandler:NULL];
-        [controller.microGamepad.buttonA setValueChangedHandler:NULL];
+        [controller.microGamepad.buttonX setPressedChangedHandler:NULL];
+        [controller.microGamepad.buttonA setPressedChangedHandler:NULL];
         [controller.microGamepad.dpad setValueChangedHandler:NULL];
         [controller setControllerPausedHandler:NULL];
     }
@@ -252,10 +252,14 @@ static SKAction *_unpauseSoundAction;
 
     // also handled extended gamepad
     if (controller && controller.gamepad) {
-        [controller.gamepad.buttonX setValueChangedHandler:NULL];
-        [controller.gamepad.buttonA setValueChangedHandler:NULL];
+        [controller.gamepad.buttonX setPressedChangedHandler:NULL];
+        [controller.gamepad.buttonA setPressedChangedHandler:NULL];
         [controller.gamepad.dpad setValueChangedHandler:NULL];
         [controller setControllerPausedHandler:NULL];
+    }
+    
+    if (controller && controller.extendedGamepad) {
+        [controller.extendedGamepad.leftThumbstick setValueChangedHandler:NULL];
     }
 }
 
@@ -290,30 +294,30 @@ static SKAction *_unpauseSoundAction;
         [w_self controllerPauseButtonPressed:controller];
     }];
 
-#ifdef TVOS
-    if (controller.microGamepad) {
-        controller.microGamepad.reportsAbsoluteDpadValues = YES;
-
-        [controller.microGamepad.buttonX setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+    if(controller.gamepad) {
+        // execute action on button x press
+        [controller.gamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonXChanged:button withValue:value isPressed:pressed];
         }];
 
-        [controller.microGamepad.buttonA setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+        [controller.gamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            [w_self buttonAChanged:button withValue:value isPressed:pressed];
+        }];
+    }
+
+#ifdef TVOS
+    else if (controller.microGamepad) {
+        controller.microGamepad.reportsAbsoluteDpadValues = YES;
+
+        [controller.microGamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            [w_self buttonXChanged:button withValue:value isPressed:pressed];
+        }];
+
+        [controller.microGamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonAChanged:button withValue:value isPressed:pressed];
         }];
     }
 #endif
-
-    if(controller.gamepad) {
-        // execute action on button x press
-        [controller.gamepad.buttonX setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
-            [w_self buttonXChanged:button withValue:value isPressed:pressed];
-        }];
-
-        [controller.gamepad.buttonA setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
-            [w_self buttonAChanged:button withValue:value isPressed:pressed];
-        }];
-    }
 }
 
 - (void)removeFromParent {
@@ -486,16 +490,21 @@ static SKAction *_unpauseSoundAction;
 }
 
 - (float)getControllerYAxis {
-#ifdef TVOS
-    if(self.gameSettingsController.controller.microGamepad) {
-        return self.gameSettingsController.controller.microGamepad.dpad.yAxis.value;
+    if(self.gameSettingsController.controller.extendedGamepad) {
+        float joystickVal = self.gameSettingsController.controller.extendedGamepad.leftThumbstick.yAxis.value;
+        float dpadVal = self.gameSettingsController.controller.gamepad.dpad.yAxis.value;
+        return joystickVal == 0 ? dpadVal : joystickVal;
     }
-#endif
 
     if(self.gameSettingsController.controller.gamepad) {
         return self.gameSettingsController.controller.gamepad.dpad.yAxis.value;
     }
 
+#ifdef TVOS
+    if(self.gameSettingsController.controller.microGamepad) {
+        return self.gameSettingsController.controller.microGamepad.dpad.yAxis.value;
+    }
+#endif
     return 0;
 }
 

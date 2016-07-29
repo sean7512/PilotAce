@@ -52,16 +52,18 @@
     BOOL hasController = [GameSettingsController sharedInstance].mustUseController || [GameSettingsController sharedInstance].controller;
 
     if(hasController) {
-#ifdef TVOS
-        if([GameSettingsController sharedInstance].controller.microGamepad) {
-#else
-        if(NO) {
-#endif
-            movePlaneInstructions = @"Touchpad";
-            shootInstructions = @"Press Play/Pause Button to Shoot";
-        } else if([GameSettingsController sharedInstance].controller.gamepad) {
+        if([GameSettingsController sharedInstance].controller.gamepad) {
             movePlaneInstructions = @"D-Pad";
             shootInstructions = @"Press X Button to Shoot";
+        }
+#ifdef TVOS
+        else if([GameSettingsController sharedInstance].controller.microGamepad) {
+            movePlaneInstructions = @"Touchpad";
+            shootInstructions = @"Press Play/Pause Button to Shoot";
+        }
+#endif
+        if([GameSettingsController sharedInstance].controller.extendedGamepad) {
+            movePlaneInstructions = @"Joystick";
         }
     }
 
@@ -122,7 +124,7 @@
     [self addChild:shoot];
 
 #ifdef TVOS
-    if(hasController && [GameSettingsController sharedInstance].controller.microGamepad) {
+    if(hasController && ![GameSettingsController sharedInstance].controller.gamepad) {
         UIImage *image = [UIImage imageNamed:@"tvOSRemote" inBundle:[NSBundle bundleForClass:[HowToPlayOverlayNode class]] compatibleWithTraitCollection:nil];
         SKSpriteNode *tvosRemote = [[SKSpriteNode alloc] initWithTexture:[SKTexture textureWithImage:image]];
 

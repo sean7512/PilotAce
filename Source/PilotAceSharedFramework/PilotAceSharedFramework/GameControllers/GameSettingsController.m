@@ -17,6 +17,8 @@
 NSString *const GAME_CONTROLLER_CONNECTED_NOTIFICATION = @"gameControllerConnected";
 NSString *const GAME_CONTROLLER_DISCONNECTED_NOTIFICATION = @"gameControllerDisconnected";
 
+NSString *const ALERT_CONTROLLER_DISMISSED = @"alertControllerDismissed";
+
 NSString *const GAME_STARTING_NOTIFICATION = @"gameIsStarting";
 NSString *const GAME_MUSIC_SETTING_CHANGED = @"gameMusicChanged";
 NSString *const GAME_MUSIC_SETTING_KEY = @"gameMusicEnabled";
@@ -318,6 +320,13 @@ static NSString *const CONTROLLER_SENSITIVITY_PREF_KEY = @"controllerSensitivity
     for(GCController *controller in controllers) {
         if(controller.isAttachedToDevice) {
             // return the first form-fitting/conencted controller
+            return controller;
+        }
+    }
+
+    for(GCController *controller in controllers) {
+        if(controller.extendedGamepad) {
+            // return the first extended
             return controller;
         }
     }
