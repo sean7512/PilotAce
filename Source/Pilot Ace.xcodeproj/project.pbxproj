@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9E26316D1BDD5E6500CA9D67 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = 9E26316A1BDD5CCD00CA9D67 /* iTunesArtwork */; };
 		9E28FC751BD5EB7E0068043B /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E28FC741BD5EB7E0068043B /* GameController.framework */; };
 		9E28FC771BD5EBC00068043B /* GameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9E28FC761BD5EBC00068043B /* GameController.framework */; };
 		9E326E7D1BD5CDCD006F2519 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E326E7C1BD5CDCD006F2519 /* main.m */; };
@@ -46,8 +45,6 @@
 		9EF4CCBE1BD9C77F00ACB6DD /* plane_explosion.caf in Resources */ = {isa = PBXBuildFile; fileRef = 9EF4CCAA1BD9C74800ACB6DD /* plane_explosion.caf */; };
 		9EF4CCBF1BD9C77F00ACB6DD /* unpause.caf in Resources */ = {isa = PBXBuildFile; fileRef = 9EF4CCAB1BD9C74800ACB6DD /* unpause.caf */; };
 		E04206D318EE5B610057A1AA /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E04206D218EE5B610057A1AA /* Social.framework */; };
-		E07A4F0E18C4BCBC00F125B0 /* iTunesArtwork in Resources */ = {isa = PBXBuildFile; fileRef = E07A4F0C18C4BCBC00F125B0 /* iTunesArtwork */; };
-		E07A4F0F18C4BCBC00F125B0 /* iTunesArtwork@2x in Resources */ = {isa = PBXBuildFile; fileRef = E07A4F0D18C4BCBC00F125B0 /* iTunesArtwork@2x */; };
 		E08FF73418AD7524003D2E05 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E08FF73318AD7524003D2E05 /* Foundation.framework */; };
 		E08FF73818AD7524003D2E05 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E08FF73718AD7524003D2E05 /* UIKit.framework */; };
 		E08FF73A18AD7524003D2E05 /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E08FF73918AD7524003D2E05 /* SpriteKit.framework */; };
@@ -135,7 +132,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		9E26316A1BDD5CCD00CA9D67 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
 		9E28FC741BD5EB7E0068043B /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS9.0.sdk/System/Library/Frameworks/GameController.framework; sourceTree = DEVELOPER_DIR; };
 		9E28FC761BD5EBC00068043B /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
 		9E326E791BD5CDCD006F2519 /* Pilot Ace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pilot Ace.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,8 +160,6 @@
 		9EF4CCAB1BD9C74800ACB6DD /* unpause.caf */ = {isa = PBXFileReference; lastKnownFileType = file; name = unpause.caf; path = PilotAceSharedFramework/PilotAceSharedFramework/Sounds/unpause.caf; sourceTree = SOURCE_ROOT; };
 		E02979B518BD4F5F00A7DC94 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		E04206D218EE5B610057A1AA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
-		E07A4F0C18C4BCBC00F125B0 /* iTunesArtwork */ = {isa = PBXFileReference; lastKnownFileType = file; path = iTunesArtwork; sourceTree = "<group>"; };
-		E07A4F0D18C4BCBC00F125B0 /* iTunesArtwork@2x */ = {isa = PBXFileReference; lastKnownFileType = file; path = "iTunesArtwork@2x"; sourceTree = "<group>"; };
 		E08FF73018AD7524003D2E05 /* Pilot Ace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pilot Ace.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E08FF73318AD7524003D2E05 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		E08FF73518AD7524003D2E05 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -235,7 +229,6 @@
 		9E326E7A1BD5CDCD006F2519 /* Pilot Ace TV */ = {
 			isa = PBXGroup;
 			children = (
-				9E26316A1BDD5CCD00CA9D67 /* iTunesArtwork */,
 				9EF4CCB61BD9C75700ACB6DD /* Sound Effects */,
 				9E6776291BD87C1800C2D53D /* Chalkduster.ttf */,
 				9E326E7E1BD5CDCD006F2519 /* AppDelegate.h */,
@@ -330,8 +323,6 @@
 		E08FF73B18AD7524003D2E05 /* Pilot Ace */ = {
 			isa = PBXGroup;
 			children = (
-				E07A4F0C18C4BCBC00F125B0 /* iTunesArtwork */,
-				E07A4F0D18C4BCBC00F125B0 /* iTunesArtwork@2x */,
 				E08FF74418AD7524003D2E05 /* PilotAceAppDelegate.h */,
 				E08FF74518AD7524003D2E05 /* PilotAceAppDelegate.m */,
 				E08FF74A18AD7524003D2E05 /* Main_iPad.storyboard */,
@@ -439,12 +430,13 @@
 			isa = PBXProject;
 			attributes = {
 				KnownAssetTags = (
+					"com.apple.gamecenter.Dashboard Image",
 					com.apple.gamecenter.HelicopterLeaderboard,
 					com.apple.gamecenter.Leaderboard,
 					"com.apple.gamecenter.Leaderboard Set",
 					com.apple.gamecenter.PlaneLeaderboard,
 				);
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = "Sean Kosanovich";
 				TargetAttributes = {
 					9E326E781BD5CDCD006F2519 = {
@@ -461,6 +453,7 @@
 					};
 					E08FF72F18AD7524003D2E05 = {
 						DevelopmentTeam = RD3NS3RA8P;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.GameCenter = {
 								enabled = 1;
@@ -528,7 +521,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E326E8D1BD5CDCD006F2519 /* Main.storyboard in Resources */,
-				9E26316D1BDD5E6500CA9D67 /* iTunesArtwork in Resources */,
 				9EF4CCAD1BD9C74800ACB6DD /* game_over_highscore.caf in Resources */,
 				9EF4CCB01BD9C74800ACB6DD /* missile_explosion.caf in Resources */,
 				9EF4CCB21BD9C74800ACB6DD /* pause.caf in Resources */,
@@ -555,10 +547,8 @@
 				9E64833A1932AB0C00DE8D02 /* Main_iPhone.storyboard in Resources */,
 				9EF4CCBF1BD9C77F00ACB6DD /* unpause.caf in Resources */,
 				9EF4CCB91BD9C77F00ACB6DD /* game_over_no_highscore.caf in Resources */,
-				E07A4F0E18C4BCBC00F125B0 /* iTunesArtwork in Resources */,
 				9EF4CCBD1BD9C77F00ACB6DD /* pause.caf in Resources */,
 				E08FF75618AD7524003D2E05 /* Images.xcassets in Resources */,
-				E07A4F0F18C4BCBC00F125B0 /* iTunesArtwork@2x in Resources */,
 				9EF4CCBE1BD9C77F00ACB6DD /* plane_explosion.caf in Resources */,
 				E08FF74018AD7524003D2E05 /* InfoPlist.strings in Resources */,
 				9EF4CCB81BD9C77F00ACB6DD /* game_over_highscore.caf in Resources */,
@@ -734,19 +724,30 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -774,18 +775,29 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -809,7 +821,9 @@
 				CLANG_WARN_OBJC_RECEIVER_WEAK = NO;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer: Sean Kosanovich (54V6H364LN)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Sean Kosanovich (54V6H364LN)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Pilot Ace/Pilot Ace-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -837,7 +851,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.seko.pilotace.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "1f435474-cf1a-402c-af26-f8ff30c57457";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -855,7 +870,9 @@
 				CLANG_WARN_OBJC_RECEIVER_WEAK = NO;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Sean Kosanovich (RD3NS3RA8P)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Sean Kosanovich (RD3NS3RA8P)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Pilot Ace/Pilot Ace-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -873,7 +890,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.seko.pilotace.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "5f374cbe-912d-4785-b617-3a11fe1d721e";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SPRITEKIT_TEXTURE_ATLAS_OUTPUT = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";

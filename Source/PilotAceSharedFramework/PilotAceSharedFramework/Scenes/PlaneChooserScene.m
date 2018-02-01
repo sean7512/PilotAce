@@ -37,18 +37,20 @@
 @property (strong, nonatomic) SKPageControl *pageControl;
 @property (assign, nonatomic) NSUInteger screenCount;
 @property (assign, nonatomic) int currentScreen;
+@property (assign, nonatomic, readonly) CGFloat sideInset;
 
 @end
 
 @implementation PlaneChooserScene
 
-- (id)initWithSize:(CGSize)size withPreviousScene:(SKScene *)prevSecene {
+- (id)initWithSize:(CGSize)size withSideInsets:(CGFloat)inset withPreviousScene:(SKScene *)prevSecene {
     if (self = [super initWithSize:size]) {
         _planeOptions = [NSMutableArray new];
         _navigableNodesByPage = [NSMutableDictionary new];
         _rootNode = [SKNode new];
         _screenCount = 0;
         _currentScreen = 0;
+        _sideInset = inset;
         _previousScene = prevSecene;
 
         [[GameSettingsController sharedInstance].menuHandlerDelegate setUseNativeMenuHandling:NO];
@@ -57,8 +59,8 @@
     return self;
 }
 
-+ (id)createWithSize:(CGSize)size withPreviousScene:(SKScene *)prevSecene {
-    PlaneChooserScene *chooser = [[PlaneChooserScene alloc] initWithSize:size withPreviousScene:prevSecene];
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset withPreviousScene:(SKScene *)prevSecene {
+    PlaneChooserScene *chooser = [[PlaneChooserScene alloc] initWithSize:size withSideInsets:inset withPreviousScene:prevSecene];
     [chooser populateScreen];
     return chooser;
 }
@@ -157,7 +159,7 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
         SKLabelNode *sceneTitleLabel = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
         sceneTitleLabel.text = [NSString stringWithFormat:@"Choose a %@", level.displayName];
         sceneTitleLabel.fontSize = 30 * nodeScale;
-        sceneTitleLabel.position = CGPointMake(CGRectGetMidX(self.frame) + (self.frame.size.width*screenOffset), self.frame.size.height-(30 * nodeScale));
+        sceneTitleLabel.position = CGPointMake((self.frame.size.width-(self.sideInset*2))/2 + (self.frame.size.width*screenOffset), self.frame.size.height-(30 * nodeScale));
         [self.rootNode addChild:sceneTitleLabel];
 
         NSMutableArray *levelOptions = [NSMutableArray new];
@@ -209,7 +211,7 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
         nextPage.text = @">";
         nextPage.fontSize = 65*nodeScale;
         nextPage.fontColor = [UIColor blueColor];
-        nextPage.position = CGPointMake(self.frame.size.width*(screenOffset+1) - (25*nodeScale), midY-(nextPage.frame.size.height/2));
+        nextPage.position = CGPointMake(self.frame.size.width*(screenOffset+1) - ((25+self.sideInset)*nodeScale), midY-(nextPage.frame.size.height/2));
         if(screenOffset < difficulties.count-1 && hasController) {
             [self.rootNode addChild:nextPage];
         }
@@ -236,7 +238,7 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
         previousPage.text = @"<";
         previousPage.fontSize = 65*nodeScale;
         previousPage.fontColor = [UIColor blueColor];
-        previousPage.position = CGPointMake(self.frame.size.width*(screenOffset+1) - self.frame.size.width + (25*nodeScale), midY-(nextPage.frame.size.height/2));
+        previousPage.position = CGPointMake(self.frame.size.width*(screenOffset+1) - self.frame.size.width + ((25+self.sideInset)*nodeScale), midY-(nextPage.frame.size.height/2));
         if(screenOffset > 0 && hasController) {
             [self.rootNode addChild:previousPage];
         }
@@ -320,9 +322,9 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
         totalNodeWidth += node.frame.size.width;
     }
 
-    CGFloat optionGap = (self.frame.size.width - totalNodeWidth)/(shapeNodes.count+1);
+    CGFloat optionGap = (self.frame.size.width - self.sideInset - totalNodeWidth)/(shapeNodes.count+1);
 
-    CGFloat nextXStart = optionGap + (self.frame.size.width * multiplier);
+    CGFloat nextXStart = optionGap + ((self.frame.size.width + self.sideInset) * multiplier);
     for (SKShapeNode *node in shapeNodes) {
         CGFloat halfNodeWidth = node.frame.size.width/2;
         node.position = CGPointMake(nextXStart+halfNodeWidth, yPos);
@@ -333,7 +335,7 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
 - (void)startGameForPlane:(Airplane *)plane forDifficultyLevel:(DifficultyLevel *)level {
     [[NSNotificationCenter defaultCenter] postNotificationName:GAME_STARTING_NOTIFICATION object:self userInfo:nil];
     SKTransition *reveal = [SKTransition crossFadeWithDuration:0.7];
-    MainLevelScene *mainLevel = [MainLevelScene createWithSize:self.size forPlane:plane forDiffucultyLebel:level];
+    MainLevelScene *mainLevel = [MainLevelScene createWithSize:self.size withSideInsets:self.sideInset forPlane:plane forDiffucultyLebel:level];
     [self.scene.view presentScene: mainLevel transition: reveal];
 }
 

@@ -1,4 +1,4 @@
-# Pilot Ace - 3.1
+# Pilot Ace - 3.2
 
 This is the source code for the iOS/tvOS game (supports iPhone, iPad, and tvOS), Pilot Ace -- https://itunes.apple.com/us/app/pilot-ace/id833488539?mt=8
 
@@ -8,4 +8,4 @@ I hope this may help new Objective-C developers or new SpriteKit developers lear
 
 If you spot any issues or have improvements, please submit a pull request.
 
-Note: This requires Xcode 7.3+
+Note: This requires Xcode 9.2+

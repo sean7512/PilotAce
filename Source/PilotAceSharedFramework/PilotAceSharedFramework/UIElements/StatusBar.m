@@ -24,6 +24,8 @@ CGFloat const STATUS_BAR_HEIGHT = 25;
 @property (assign, nonatomic) CGFloat yPosition;
 @property (assign, nonatomic) CGFloat baseDistanceXPosition;
 
+@property(assign, nonatomic, readonly) CGFloat sideInset;
+
 @end
 
 @implementation StatusBar
@@ -34,16 +36,17 @@ static CGFloat const STATUS_BAR_FONT_SIZE = 15;
 
 static NSString *const DISTANCE_FORMAT_STRING = @"Distance: %.3f km";
 
-- (id)initWithPauseSceneController:(SKScene<PauseGameController> *)scene {
+- (id)initWithPauseSceneController:(SKScene<PauseGameController> *)scene withSideInsets:(CGFloat)inset {
     self = [super init];
     if(self) {
         _scenePauseController = scene;
+        _sideInset = inset;
     }
     return self;
 }
 
-+ (id)createWithPauseSceneController:(SKScene<PauseGameController> *)scene {
-    StatusBar *bar = [[StatusBar alloc] initWithPauseSceneController:scene];
++ (id)createWithPauseSceneController:(SKScene<PauseGameController> *)scene withSideInsets:(CGFloat)inset {
+    StatusBar *bar = [[StatusBar alloc] initWithPauseSceneController:scene withSideInsets:inset];
     [bar populateStatusBar];
     return bar;
 }
@@ -57,7 +60,7 @@ static NSString *const DISTANCE_FORMAT_STRING = @"Distance: %.3f km";
     SKLabelNode *fuelLabel = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
     fuelLabel.fontSize = STATUS_BAR_FONT_SIZE*nodeScale;
     fuelLabel.text = @"Fuel:";
-    fuelLabel.position = CGPointMake(STATUS_BAR_PADDING*nodeScale + (fuelLabel.frame.size.width/2), self.yPosition);
+    fuelLabel.position = CGPointMake([self generateStatusBarMargin]*nodeScale + (fuelLabel.frame.size.width/2), self.yPosition);
     [self addChild:fuelLabel];
 
     // fuel dynamic indicator - next to static fuel label
@@ -75,7 +78,7 @@ static NSString *const DISTANCE_FORMAT_STRING = @"Distance: %.3f km";
     }];
     pauseButton.fontSize = STATUS_BAR_FONT_SIZE*nodeScale;
     pauseButton.text = @"  | |  ";
-    pauseButton.position = CGPointMake(self.scenePauseController.frame.size.width - pauseButton.frame.size.width/2 - STATUS_BAR_PADDING*nodeScale, self.yPosition);
+    pauseButton.position = CGPointMake(self.scenePauseController.frame.size.width - pauseButton.frame.size.width/2 - [self generateStatusBarMargin]*nodeScale, self.yPosition);
     if(! ([GameSettingsController sharedInstance].mustUseController || [GameSettingsController sharedInstance].controller)) {
         [self addChild:pauseButton];
     }
@@ -104,6 +107,10 @@ static NSString *const DISTANCE_FORMAT_STRING = @"Distance: %.3f km";
 
 - (NSString *)getDistanceLabelForDistance:(int64_t)distanceKm {
     return [NSString stringWithFormat:DISTANCE_FORMAT_STRING, [DistanceUtils getFloatScore:distanceKm]];
+}
+
+- (CGFloat)generateStatusBarMargin {
+    return STATUS_BAR_PADDING+self.sideInset;
 }
 
 @end

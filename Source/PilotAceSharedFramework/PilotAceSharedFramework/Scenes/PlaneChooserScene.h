@@ -10,6 +10,6 @@
 
 @interface PlaneChooserScene : NavigableScene
 
-+ (id)createWithSize:(CGSize)size withPreviousScene:(SKScene *)prevSecene;
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset withPreviousScene:(SKScene *)prevSecene;
 
 @end

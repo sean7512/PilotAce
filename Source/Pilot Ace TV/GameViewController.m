@@ -63,7 +63,12 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
         }
 
         // Create and configure the scene.
-        SKScene * scene = [MainMenuScene createWithSize:skView.bounds.size];
+        CGFloat sideInset = 0;
+        if (@available(iOS 11, *)) {
+            // need to get safe area left/right insets so we don't place controls to close to the edge of the screen (notch, etc)
+            sideInset = skView.safeAreaInsets.left;
+        }
+        SKScene * scene = [MainMenuScene createWithSize:skView.bounds.size withSideInsets:sideInset];
         scene.scaleMode = SKSceneScaleModeAspectFill;
 
         // Present the scene.

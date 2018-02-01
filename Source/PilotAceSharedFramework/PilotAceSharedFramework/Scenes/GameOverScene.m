@@ -22,6 +22,7 @@
 @interface GameOverScene()
 
 @property (strong, nonatomic, readonly) DifficultyLevel *difficultyLevel;
+@property (assign, nonatomic, readonly) CGFloat sideInset;
 
 @end
 
@@ -33,9 +34,10 @@ static NSString *const NO_HIGHSCORE_SOUND = @"game_over_no_highscore.caf";
 static SKAction *_highscoreSoundAction;
 static SKAction *_noHighscoreSoundAction;
 
-- (id)initWithSize:(CGSize)size forDifficulty:(DifficultyLevel *)difficulty {
+- (id)initWithSize:(CGSize)size withSideInsets:(CGFloat)inset forDifficulty:(DifficultyLevel *)difficulty {
     if (self = [super initWithSize:size]) {
         _difficultyLevel = difficulty;
+        _sideInset = inset;
 
         static dispatch_once_t loadGameOverSoundsOnce;
         dispatch_once(&loadGameOverSoundsOnce, ^{
@@ -47,8 +49,8 @@ static SKAction *_noHighscoreSoundAction;
     return self;
 }
 
-+ (id)createWithSize:(CGSize)size withDistanceTraveled:(int64_t)distanceKm forDifficulty:(DifficultyLevel *)difficulty {
-    GameOverScene *gameOver = [[GameOverScene alloc] initWithSize:size forDifficulty:difficulty];
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset withDistanceTraveled:(int64_t)distanceKm forDifficulty:(DifficultyLevel *)difficulty {
+    GameOverScene *gameOver = [[GameOverScene alloc] initWithSize:size withSideInsets:inset forDifficulty:difficulty];
     [gameOver populateInitialScreenWithDistanceTraveled:distanceKm];
     return gameOver;
 }
@@ -131,7 +133,7 @@ static SKAction *_noHighscoreSoundAction;
         if(w_self) {
             [w_self cleanupControllerHandlers];
             SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:0.7];
-            PlaneChooserScene *planeChooser = [PlaneChooserScene createWithSize:w_self.frame.size withPreviousScene:w_self];
+            PlaneChooserScene *planeChooser = [PlaneChooserScene createWithSize:w_self.frame.size withSideInsets:self.sideInset withPreviousScene:w_self];
             [w_self.scene.view presentScene:planeChooser transition: reveal];
         }
     }];

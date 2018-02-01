@@ -13,7 +13,7 @@ extern CGFloat const STATUS_BAR_HEIGHT;
 
 @interface StatusBar : SKNode
 
-+ (id)createWithPauseSceneController:(SKScene<PauseGameController> *)scene;
++ (id)createWithPauseSceneController:(SKScene<PauseGameController> *)scene withSideInsets:(CGFloat)inset;
 - (void)updateWithFuelPercent:(float)fuelPercent withDistance:(int64_t)distanceKm;
 
 @end

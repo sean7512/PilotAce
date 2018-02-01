@@ -62,12 +62,15 @@
 @property (assign, nonatomic) CGFloat nodeScale;
 @property (assign, nonatomic) CGFloat currSceneSpeed;
 
+@property (assign, nonatomic, readonly) CGFloat sideInset;
+
 @end
 
 @implementation MainLevelScene
 
 static CGFloat const TOP_LAYER_Z_INDEX = 100;
 static CGFloat const PLANE_X_POS = 130;
+static CGFloat const PLANE_DRAG_X = 180;
 static CGFloat const PLANE_Y_BOUNDING_BOX = 50;
 static NSTimeInterval const NEVER_DIED_TAG = -1;
 static NSTimeInterval const DEF_TIME_PAUSED = 0;
@@ -82,7 +85,7 @@ static NSString *const MUSIC_EXTENSION = @"caf";
 static SKAction *_pauseSoundAction;
 static SKAction *_unpauseSoundAction;
 
-- (id)initWithSize:(CGSize)size forDifficultyLevel:(DifficultyLevel *)difficulty {
+- (id)initWithSize:(CGSize)size withSideInsets:(CGFloat)inset forDifficultyLevel:(DifficultyLevel *)difficulty {
     if (self = [super initWithSize:size]) {
         _diedTime = NEVER_DIED_TAG;
         _isGameOver = NO;
@@ -95,6 +98,8 @@ static SKAction *_unpauseSoundAction;
         _controllerSensitivity = [_gameSettingsController getControllerSensitivity];
 
         [_gameSettingsController.menuHandlerDelegate setUseNativeMenuHandling:NO];
+
+        _sideInset = inset;
 
         MainLevelScene * __weak w_self = self;
         [[NSNotificationCenter defaultCenter] addObserverForName:GAME_CONTROLLER_CONNECTED_NOTIFICATION object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
@@ -114,8 +119,8 @@ static SKAction *_unpauseSoundAction;
     return self;
 }
 
-+ (id)createWithSize:(CGSize)size forPlane: (Airplane *)plane forDiffucultyLebel: (DifficultyLevel *)difficulty {
-    MainLevelScene *mainLevel = [[MainLevelScene alloc] initWithSize:size forDifficultyLevel:difficulty];
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset forPlane: (Airplane *)plane forDiffucultyLebel: (DifficultyLevel *)difficulty {
+    MainLevelScene *mainLevel = [[MainLevelScene alloc] initWithSize:size withSideInsets:inset forDifficultyLevel:difficulty];
     [mainLevel populateInitialScreenForPlane:plane];
 
     // setup controller
@@ -165,16 +170,16 @@ static SKAction *_unpauseSoundAction;
             [w_self.bulletController shootBulletAt:[w_self.planeController getPlaneBulletPosition]];
         }
     }];
-    [self.fireButton rectWithWidth:(self.size.width - (PLANE_X_POS*self.nodeScale)) height:(self.size.height)];
+    [self.fireButton rectWithWidth:(self.size.width - (PLANE_DRAG_X*self.nodeScale)) height:(self.size.height)];
     self.fireButton.strokeColor = [SKColor clearColor];
     self.fireButton.fillColor = [SKColor clearColor];
     self.fireButton.antialiased = NO;
     self.fireButton.zPosition = TOP_LAYER_Z_INDEX;
-    self.fireButton.position = CGPointMake(PLANE_X_POS*self.nodeScale, 0);
+    self.fireButton.position = CGPointMake(PLANE_DRAG_X*self.nodeScale, 0);
     [self addChild:self.fireButton];
 
     // status bar
-    self.statusBar = [StatusBar createWithPauseSceneController:self];
+    self.statusBar = [StatusBar createWithPauseSceneController:self withSideInsets:self.sideInset];
     self.statusBar.position = CGPointMake(0, self.frame.size.height - self.statusBar.frame.size.height);
     self.statusBar.zPosition = TOP_LAYER_Z_INDEX;
     [self addChild:self.statusBar];
@@ -230,7 +235,7 @@ static SKAction *_unpauseSoundAction;
 
     for(UITouch *touch in touches) {
         CGPoint touchPos = [touch locationInNode:self];
-        if(touchPos.x < PLANE_X_POS*self.nodeScale) {
+        if(touchPos.x < PLANE_DRAG_X*self.nodeScale) {
             if(touchPos.y > ([self.planeController getPlanePosition].y - (self.planeHeight/2) - PLANE_Y_BOUNDING_BOX) && touchPos.y < ([self.planeController getPlanePosition].y + (self.planeHeight/2) + PLANE_Y_BOUNDING_BOX)) {
                 [self.planeController movePlaneToY:touchPos.y];
             }
@@ -434,7 +439,7 @@ static SKAction *_unpauseSoundAction;
 - (void)transitionToGameOverScene {
     self.isGameOverTransitionRequested = YES;
     SKTransition *reveal = [SKTransition doorsCloseHorizontalWithDuration:0.7];
-    GameOverScene *gameOverScene = [GameOverScene createWithSize:self.frame.size withDistanceTraveled:self.distanceController.distanceTraveledKm forDifficulty:self.difficultyLevel];
+    GameOverScene *gameOverScene = [GameOverScene createWithSize:self.frame.size withSideInsets:self.sideInset withDistanceTraveled:self.distanceController.distanceTraveledKm forDifficulty:self.difficultyLevel];
     [self.scene.view presentScene:gameOverScene transition:reveal];
 }
 

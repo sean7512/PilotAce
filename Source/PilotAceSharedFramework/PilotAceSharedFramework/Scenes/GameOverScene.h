@@ -13,6 +13,6 @@
 
 @interface GameOverScene : NavigableScene <SystemMenuHandlingScene>
 
-+ (id)createWithSize:(CGSize)size withDistanceTraveled:(int64_t)distanceKm forDifficulty:(DifficultyLevel *)difficulty;
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset withDistanceTraveled:(int64_t)distanceKm forDifficulty:(DifficultyLevel *)difficulty;
 
 @end

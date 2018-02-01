@@ -21,19 +21,20 @@
 
 @interface MainMenuScene()
 @property (nonatomic, strong) Airplane *titlePlane;
+@property (assign, nonatomic, readonly) CGFloat sideInset;
 @end
 
 @implementation MainMenuScene
 
-- (id)initWithSize:(CGSize)size {    
+- (id)initWithSize:(CGSize)size withSideInsets:(CGFloat)inset {
     if (self = [super initWithSize:size]) {
-        // nothing to init
+        _sideInset = inset;
     }
     return self;
 }
 
-+ (id)createWithSize:(CGSize)size {
-    MainMenuScene *mainMenu = [[MainMenuScene alloc] initWithSize:size];
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset {
+    MainMenuScene *mainMenu = [[MainMenuScene alloc] initWithSize:size withSideInsets:inset];
     [mainMenu populateInitialScreen];
     return mainMenu;
 }
@@ -98,7 +99,7 @@
             [w_self.titlePlane runAction:planeFlyAction completion:^{
                 [w_self cleanupControllerHandlers];
                 SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionLeft duration:0.7];
-                PlaneChooserScene *planeChooser = [PlaneChooserScene createWithSize:w_self.frame.size withPreviousScene:w_self];
+                PlaneChooserScene *planeChooser = [PlaneChooserScene createWithSize:w_self.frame.size withSideInsets:w_self.sideInset withPreviousScene:w_self];
                 [w_self.scene.view presentScene: planeChooser transition: reveal];
             }];
         }

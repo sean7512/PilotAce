@@ -14,6 +14,6 @@
 
 @interface MainLevelScene : SKScene <PauseGameController>
 
-+ (id)createWithSize:(CGSize)size forPlane: (Airplane *)plane forDiffucultyLebel: (DifficultyLevel *)difficulty;
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset forPlane: (Airplane *)plane forDiffucultyLebel: (DifficultyLevel *)difficulty;
 
 @end

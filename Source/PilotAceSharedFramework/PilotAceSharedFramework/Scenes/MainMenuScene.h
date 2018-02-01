@@ -11,6 +11,6 @@
 
 @interface MainMenuScene : NavigableScene <SystemMenuHandlingScene>
 
-+ (id)createWithSize:(CGSize)size;
++ (id)createWithSize:(CGSize)size withSideInsets:(CGFloat)inset;
 
 @end
