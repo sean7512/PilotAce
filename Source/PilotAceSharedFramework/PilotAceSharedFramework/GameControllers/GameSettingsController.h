@@ -19,6 +19,11 @@ extern NSString *const GAME_STARTING_NOTIFICATION;
 extern NSString *const GAME_MUSIC_SETTING_CHANGED;
 extern NSString *const GAME_MUSIC_SETTING_KEY;
 
+extern NSString *const SHOW_BANNER_AD;
+extern NSString *const HIDE_BANNER_AD;
+extern NSString *const ASK_AD_CONSENT;
+extern NSString *const SHOW_FULLSCREEN_AD;
+extern NSString *const FULLSCREEN_INTERVAL_KEY;
 extern NSString *const SHOW_SHARE_SHEET;
 extern NSString *const SHARE_TEXT_KEY;
 extern NSString *const SHARE_RECT_KEY;
@@ -46,6 +51,11 @@ typedef NS_ENUM(NSInteger, ControllerSensitivity) {
 @protocol SocialShareDelegate <NSObject>
 @required
 - (BOOL)canUseShare;
+@end
+
+@protocol AdConsentManager <NSObject>
+@required
+- (BOOL)isRequiredToAskForConsent;
 @end
 
 @protocol AlertControllerPresenter <NSObject>
@@ -78,6 +88,10 @@ typedef NS_ENUM(NSInteger, ControllerSensitivity) {
 - (void)setGameMusicEnabled:(BOOL)enabled;
 - (BOOL)isSoundEffectsEnabled;
 - (void)setSoundEffectsEnabled:(BOOL)enabled;
+
+// game settings
+- (BOOL)isAutoShootEnabled;
+- (void)setAutoShootEnabled:(BOOL)enabled;
 - (ControllerSensitivity)getControllerSensitivity;
 - (void)setControllerSensitivity:(ControllerSensitivity)sensitivity;
 
@@ -91,5 +105,6 @@ typedef NS_ENUM(NSInteger, ControllerSensitivity) {
 @property (weak, nonatomic) id<SocialShareDelegate> shareDelegate;
 @property (weak, nonatomic) id<AlertControllerPresenter> alertDelegate;
 @property (weak, nonatomic) id<MenuHandler> menuHandlerDelegate;
+@property (weak, nonatomic) id<AdConsentManager> adConsentManager;
 
 @end

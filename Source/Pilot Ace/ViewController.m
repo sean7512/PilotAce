@@ -12,8 +12,9 @@
 #import <Social/Social.h>
 #import <PilotAceSharedFramework/PilotAceSharedFramework.h>
 #import "ViewController.h"
+#import "Pilot_Ace-Swift.h"
 
-@interface ViewController() <AlertControllerPresenter, MenuHandler>
+@interface ViewController() <AlertControllerPresenter, MenuHandler, AdConsentManager>
 
 @property (strong, nonatomic) AVAudioPlayer *themeMusicPlayer;
 
@@ -35,6 +36,10 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gameStarting:) name:GAME_STARTING_NOTIFICATION object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gameMusicSettingChanged:) name:GAME_MUSIC_SETTING_CHANGED object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(shareText:) name:SHOW_SHARE_SHEET object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showFullscreenAd:) name:SHOW_FULLSCREEN_AD object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(askForAdConsent:) name:ASK_AD_CONSENT object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showBannerAd:) name:SHOW_BANNER_AD object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(hideBannerAd:) name:HIDE_BANNER_AD object:nil];
 }
 
 - (void)viewWillLayoutSubviews {
@@ -45,6 +50,8 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
 
     // only do once...
     if(!skView.scene) {
+        [SwiftyAdsHelper setupAdsWithVc:self];
+
         skView.showsFields = NO;
         skView.showsFPS = NO;
         skView.showsNodeCount = NO;
@@ -52,6 +59,7 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
 
         [GameSettingsController sharedInstance].alertDelegate = self;
         [GameSettingsController sharedInstance].menuHandlerDelegate = self;
+        [GameSettingsController sharedInstance].adConsentManager = self;
 
         // theme music
         NSError *error;
@@ -170,10 +178,31 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
     // do nothing
 }
 
+- (BOOL)isRequiredToAskForConsent {
+    return SwiftyAdsHelper.isRequiredToAskForConsent;
+}
+
+- (void)showFullscreenAd:(NSNotification *)notification {
+    NSNumber *interval = notification.userInfo[FULLSCREEN_INTERVAL_KEY];
+    [SwiftyAdsHelper requestFullscreenWithViewController:self withInterval:interval.intValue];
+}
+
+- (void)askForAdConsent:(NSNotification *)notification {
+    [SwiftyAdsHelper askForConsentWithViewController:self];
+}
+
+- (void)showBannerAd:(NSNotification *)notification {
+    [SwiftyAdsHelper showBannerAd:self];
+}
+
+- (void)hideBannerAd:(NSNotification *)notification {
+    [SwiftyAdsHelper hideBannerAd];
+}
+
 - (void)shareText:(NSNotification *)notification {
     NSString *shareText = notification.userInfo[SHARE_TEXT_KEY];
     SKNode *popOverLocation = (notification.userInfo[SHARE_RECT_KEY]);
-    UIImage *img = [UIImage imageNamed:@"iTunesArtwork"];
+    UIImage *img = [UIImage imageNamed:@"iTunesArtwork@2x.png"];
 
     UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:@[shareText, img] applicationActivities:nil];
     if(activityVC.popoverPresentationController) {

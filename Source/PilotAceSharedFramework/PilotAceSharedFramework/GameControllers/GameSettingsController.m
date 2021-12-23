@@ -23,6 +23,11 @@ NSString *const GAME_STARTING_NOTIFICATION = @"gameIsStarting";
 NSString *const GAME_MUSIC_SETTING_CHANGED = @"gameMusicChanged";
 NSString *const GAME_MUSIC_SETTING_KEY = @"gameMusicEnabled";
 
+NSString *const SHOW_BANNER_AD = @"showBannerAd";
+NSString *const HIDE_BANNER_AD = @"hideBanenrAd";
+NSString *const ASK_AD_CONSENT = @"askAdConsent";
+NSString *const SHOW_FULLSCREEN_AD = @"showFullscreenAd";
+NSString *const FULLSCREEN_INTERVAL_KEY = @"interval";
 NSString *const SHOW_SHARE_SHEET = @"showShareSheet";
 NSString *const SHARE_TEXT_KEY = @"shareText";
 NSString *const SHARE_RECT_KEY = @"shareRect";
@@ -41,6 +46,7 @@ static NSString *const HIGH_SCORE_PREF_KEY = @"highscore";
 static NSString *const PLAYER_ID_PREF_KEY = @"playerId";
 static NSString *const GAME_MUSIC_PREF_KEY = @"gameMusic";
 static NSString *const SOUND_EFFECTS_PREF_KEY = @"soundEffects";
+static NSString *const AUTO_SHOOT_PREF_KEY = @"autoShoot";
 static NSString *const CONTROLLER_SENSITIVITY_PREF_KEY = @"controllerSensitivity";
 
 + (GameSettingsController *)sharedInstance {
@@ -225,6 +231,14 @@ static NSString *const CONTROLLER_SENSITIVITY_PREF_KEY = @"controllerSensitivity
     [self setBool:enabled forPrefKey:SOUND_EFFECTS_PREF_KEY];
 }
 
+- (BOOL)isAutoShootEnabled {
+    return [self getBoolPrefForKey:AUTO_SHOOT_PREF_KEY defaultValue:NO];
+}
+
+- (void)setAutoShootEnabled:(BOOL)enabled {
+    [self setBool:enabled forPrefKey:AUTO_SHOOT_PREF_KEY];
+}
+
 - (ControllerSensitivity)getControllerSensitivityFromPrefs {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     if (![prefs objectForKey:CONTROLLER_SENSITIVITY_PREF_KEY]) {
@@ -277,12 +291,10 @@ static NSString *const CONTROLLER_SENSITIVITY_PREF_KEY = @"controllerSensitivity
         // use the first controller
         self.controller = [GameSettingsController getControllerToUse];
 
-#ifdef TVOS
         if (self.controller.microGamepad) {
             // apple tv remote is used sideways
             self.controller.microGamepad.allowsRotation = YES;
         }
-#endif
         self.controller.playerIndex = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName:GAME_CONTROLLER_CONNECTED_NOTIFICATION object:self];
     } else {
@@ -319,7 +331,7 @@ static NSString *const CONTROLLER_SENSITIVITY_PREF_KEY = @"controllerSensitivity
 
     for(GCController *controller in controllers) {
         if(controller.isAttachedToDevice) {
-            // return the first form-fitting/conencted controller
+            // return the first form-fitting/connected controller
             return controller;
         }
     }

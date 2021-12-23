@@ -44,6 +44,7 @@
 }
 
 - (void)populate {
+    [[NSNotificationCenter defaultCenter] postNotificationName:HIDE_BANNER_AD object:self userInfo:nil];
     self.physicsWorld.gravity = CGVectorMake(0, 0);
 
     [SceneTimeOfDayFactory setUpScene:self forTimeOfDayData:[DayTimeSceneData sharedInstance] withMovement:NO];
@@ -93,7 +94,18 @@
     soundFx.selectedOption = [self getOnOffForBool:[gameSettings isSoundEffectsEnabled]];
     [self.navigableNodes addObject:@[soundFx]];
 
-    SKNode *prevNode = soundFx;
+    MultiOptionSelect *autoShoot = [MultiOptionSelect createWithLabel:@"Auto Shoot:" withOptions:@[@"On", @"Off"] withSelectedValueChangeListener:^(id selectedOption){
+        if(w_self) {
+            [gameSettings setAutoShootEnabled:[w_self getBoolForOnOffString:selectedOption]];
+        }
+    }];
+    autoShoot.position = CGPointMake(midX-25*nodeScale, soundFx.position.y - 40*nodeScale);
+    [self addChild:autoShoot];
+    autoShoot.selectedOption = [self getOnOffForBool:[gameSettings isAutoShootEnabled]];
+    [self.navigableNodes addObject:@[autoShoot]];
+
+
+    SKNode *prevNode = autoShoot;
 
     BOOL mustUseController = [GameSettingsController sharedInstance].mustUseController;
     BOOL hasController = mustUseController || [GameSettingsController sharedInstance].controller;
@@ -104,7 +116,7 @@
                 [gameSettings setControllerSensitivity:[w_self getControllerSensitivityString:selectedOption]];
             }
         }];
-        controllerSensitivity.position = CGPointMake(midX-25*nodeScale, soundFx.position.y - 40*nodeScale);
+        controllerSensitivity.position = CGPointMake(midX-25*nodeScale, prevNode.position.y - 40*nodeScale);
         [self addChild:controllerSensitivity];
         controllerSensitivity.selectedOption = [self getSensitivityLabelForSensitivity:[gameSettings getControllerSensitivity]];
         [self.navigableNodes addObject:@[controllerSensitivity]];
@@ -124,6 +136,21 @@
     aboutButton.position = CGPointMake(midX, prevNode.position.y - 40*nodeScale);
     [self addChild:aboutButton];
     [self.navigableNodes addObject:@[aboutButton]];
+    prevNode = aboutButton;
+
+    if ([GameSettingsController sharedInstance].adConsentManager && [[GameSettingsController sharedInstance].adConsentManager isRequiredToAskForConsent]) {
+        // we need to ask for ad consent, add a button here to allow that
+        LabelButton *consentButton = [LabelButton createWithFontNamed:GAME_FONT withTouchEventCallback:^{
+            if(w_self) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:ASK_AD_CONSENT object:w_self userInfo:nil];
+            }
+        }];
+        consentButton.text = @"Update Ad Preference";
+        consentButton.fontSize = 25*nodeScale;
+        consentButton.position = CGPointMake(midX, prevNode.position.y - 40*nodeScale);
+        [self addChild:consentButton];
+        [self.navigableNodes addObject:@[consentButton]];
+    }
 
     // make main menu button last in navigable tree
     [self.navigableNodes addObject:@[mainMenuButton]];
@@ -135,12 +162,21 @@
     [super setupController:controller];
 
     SettingsScene * __weak w_self = self;
-    [controller setControllerPausedHandler:^(GCController * _Nonnull controller) {
-        if(w_self) {
-            SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
-            [w_self.scene.view presentScene: w_self.sceneToTransitionTo transition: reveal];
-        }
-    }];
+    if (controller && controller.microGamepad) {
+        [controller.microGamepad.buttonMenu setPressedChangedHandler: ^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if(w_self && pressed) {
+                SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
+                [w_self.scene.view presentScene: w_self.sceneToTransitionTo transition: reveal];
+            }
+        }];
+    } else if (controller && controller.extendedGamepad) {
+        [controller.extendedGamepad.buttonMenu setPressedChangedHandler: ^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if(w_self && pressed) {
+                SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
+                [w_self.scene.view presentScene: w_self.sceneToTransitionTo transition: reveal];
+            }
+        }];
+    }
 }
 
 - (NSString *)getOnOffForBool:(BOOL)value {

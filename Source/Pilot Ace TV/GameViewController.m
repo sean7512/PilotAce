@@ -76,19 +76,6 @@ static NSString *const THEME_MUSIC_FILE = @"main_theme";
     }
 }
 
-- (BOOL)prefersStatusBarHidden {
-    return YES;
-}
-
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    // only support landscape in both ipad and iphone
-    return UIInterfaceOrientationMaskLandscape;
-}
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc that aren't in use.

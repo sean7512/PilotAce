@@ -18,6 +18,7 @@
 #import "DifficultyLevel.h"
 #import "SettingsScene.h"
 #import "NavigableScene_Protected.h"
+#import <StoreKit/StoreKit.h>
 
 @interface GameOverScene()
 
@@ -173,6 +174,18 @@ static SKAction *_noHighscoreSoundAction;
     }
 
     self.selectedNode = playButton;
+
+    // show fullscreen ad at interval 3
+    [[NSNotificationCenter defaultCenter] postNotificationName:SHOW_FULLSCREEN_AD object:self userInfo:@{FULLSCREEN_INTERVAL_KEY: @3}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SHOW_BANNER_AD object:self userInfo:nil];
+#ifndef TVOS
+    for (UIScene *scene in UIApplication.sharedApplication.connectedScenes) {
+        if (scene.activationState == UISceneActivationStateForegroundActive && [scene isKindOfClass: UIWindowScene.class]) {
+            [SKStoreReviewController requestReviewInScene: (UIWindowScene *) scene];
+            break;
+        }
+    }
+#endif
 }
 
 @end

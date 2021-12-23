@@ -50,6 +50,7 @@
 @property (strong, nonatomic) AVAudioPlayer *backgroundMusicPlayer;
 @property (strong, nonatomic, readonly) DifficultyLevel *difficultyLevel;
 @property (strong, nonatomic, readonly) GameSettingsController *gameSettingsController;
+@property (strong, nonatomic) NSTimer *autoShootTimer;
 
 @property (assign, nonatomic) ControllerSensitivity controllerSensitivity;
 @property (assign, nonatomic) NSTimeInterval diedTime;
@@ -164,19 +165,21 @@ static SKAction *_unpauseSoundAction;
 
     // fire button
     MainLevelScene * __weak w_self = self;
-    self.fireButton = [ShapedButton createWithTouchDownInsideEventCallBack:^{
-        if(w_self && !w_self.isGameOver && !w_self.isPausedByUser && ![GameSettingsController sharedInstance].mustUseController && ![GameSettingsController sharedInstance].controller) {
-            // shoot bullet
-            [w_self.bulletController shootBulletAt:[w_self.planeController getPlaneBulletPosition]];
-        }
-    }];
-    [self.fireButton rectWithWidth:(self.size.width - (PLANE_DRAG_X*self.nodeScale)) height:(self.size.height)];
-    self.fireButton.strokeColor = [SKColor clearColor];
-    self.fireButton.fillColor = [SKColor clearColor];
-    self.fireButton.antialiased = NO;
-    self.fireButton.zPosition = TOP_LAYER_Z_INDEX;
-    self.fireButton.position = CGPointMake(PLANE_DRAG_X*self.nodeScale, 0);
-    [self addChild:self.fireButton];
+    if (![self.gameSettingsController isAutoShootEnabled]) {
+        self.fireButton = [ShapedButton createWithTouchDownInsideEventCallBack:^{
+            if(w_self && !w_self.isGameOver && !w_self.isPausedByUser && ![GameSettingsController sharedInstance].mustUseController && ![GameSettingsController sharedInstance].controller) {
+                // shoot bullet
+                [w_self.bulletController shootBulletAt:[w_self.planeController getPlaneBulletPosition]];
+            }
+        }];
+        [self.fireButton rectWithWidth:(self.size.width - (PLANE_DRAG_X*self.nodeScale)) height:(self.size.height)];
+        self.fireButton.strokeColor = [SKColor clearColor];
+        self.fireButton.fillColor = [SKColor clearColor];
+        self.fireButton.antialiased = NO;
+        self.fireButton.zPosition = TOP_LAYER_Z_INDEX;
+        self.fireButton.position = CGPointMake(PLANE_DRAG_X*self.nodeScale, 0);
+        [self addChild:self.fireButton];
+    }
 
     // status bar
     self.statusBar = [StatusBar createWithPauseSceneController:self withSideInsets:self.sideInset];
@@ -210,6 +213,15 @@ static SKAction *_unpauseSoundAction;
     // start game in a paused state, dismissing the instructions will resume
     self.isPausedByUser = YES;
     self.currSceneSpeed = self.speed;
+
+    if ([self.gameSettingsController isAutoShootEnabled]) {
+        self.autoShootTimer = [NSTimer scheduledTimerWithTimeInterval:0.30 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            if(w_self && !w_self.isGameOver && !w_self.isPausedByUser) {
+                // shoot bullet
+                [w_self.bulletController shootBulletAt:[w_self.planeController getPlaneBulletPosition]];
+            }
+        }];
+    }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -235,7 +247,7 @@ static SKAction *_unpauseSoundAction;
 
     for(UITouch *touch in touches) {
         CGPoint touchPos = [touch locationInNode:self];
-        if(touchPos.x < PLANE_DRAG_X*self.nodeScale) {
+        if([self.gameSettingsController isAutoShootEnabled] || touchPos.x < PLANE_DRAG_X*self.nodeScale) {
             if(touchPos.y > ([self.planeController getPlanePosition].y - (self.planeHeight/2) - PLANE_Y_BOUNDING_BOX) && touchPos.y < ([self.planeController getPlanePosition].y + (self.planeHeight/2) + PLANE_Y_BOUNDING_BOX)) {
                 [self.planeController movePlaneToY:touchPos.y];
             }
@@ -246,21 +258,19 @@ static SKAction *_unpauseSoundAction;
 - (void)cleanupControllerHandlers {
     GCController *controller = [GameSettingsController sharedInstance].controller;
 
-#ifdef TVOS
     if (controller && controller.microGamepad) {
         [controller.microGamepad.buttonX setPressedChangedHandler:NULL];
         [controller.microGamepad.buttonA setPressedChangedHandler:NULL];
         [controller.microGamepad.dpad setValueChangedHandler:NULL];
-        [controller setControllerPausedHandler:NULL];
+        [controller.microGamepad.buttonMenu setValueChangedHandler:NULL];
     }
-#endif
 
     // also handled extended gamepad
-    if (controller && controller.gamepad) {
-        [controller.gamepad.buttonX setPressedChangedHandler:NULL];
-        [controller.gamepad.buttonA setPressedChangedHandler:NULL];
-        [controller.gamepad.dpad setValueChangedHandler:NULL];
-        [controller setControllerPausedHandler:NULL];
+    if (controller && controller.extendedGamepad) {
+        [controller.extendedGamepad.buttonX setPressedChangedHandler:NULL];
+        [controller.extendedGamepad.buttonA setPressedChangedHandler:NULL];
+        [controller.extendedGamepad.dpad setValueChangedHandler:NULL];
+        [controller.extendedGamepad.buttonMenu setValueChangedHandler:NULL];
     }
     
     if (controller && controller.extendedGamepad) {
@@ -269,7 +279,7 @@ static SKAction *_unpauseSoundAction;
 }
 
 - (void)buttonXChanged:(GCControllerButtonInput *)button withValue:(float)value isPressed:(BOOL)pressed {
-    if(pressed && !self.isGameOver && !self.isPausedByUser) {
+    if(pressed && !self.isGameOver && !self.isPausedByUser && ![self.gameSettingsController isAutoShootEnabled]) {
         // shoot bullet
         [self.bulletController shootBulletAt:[self.planeController getPlaneBulletPosition]];
     } else if (self.howToPlay && self.howToPlay.scene && pressed) {
@@ -295,23 +305,22 @@ static SKAction *_unpauseSoundAction;
 - (void)setupController:(GCController *)controller {
     MainLevelScene * __weak w_self = self;
 
-    [controller setControllerPausedHandler:^(GCController * _Nonnull controller) {
-        [w_self controllerPauseButtonPressed:controller];
-    }];
-
-    if(controller.gamepad) {
+    if(controller.extendedGamepad) {
         // execute action on button x press
-        [controller.gamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+        [controller.extendedGamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonXChanged:button withValue:value isPressed:pressed];
         }];
 
-        [controller.gamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+        [controller.extendedGamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonAChanged:button withValue:value isPressed:pressed];
         }];
-    }
 
-#ifdef TVOS
-    else if (controller.microGamepad) {
+        [controller.extendedGamepad.buttonMenu setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if (pressed) {
+                [w_self controllerPauseButtonPressed:controller];
+            }
+        }];
+    } else if (controller.microGamepad) {
         controller.microGamepad.reportsAbsoluteDpadValues = YES;
 
         [controller.microGamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
@@ -321,8 +330,13 @@ static SKAction *_unpauseSoundAction;
         [controller.microGamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonAChanged:button withValue:value isPressed:pressed];
         }];
+
+        [controller.microGamepad.buttonMenu setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if (pressed) {
+                [w_self controllerPauseButtonPressed:controller];
+            }
+        }];
     }
-#endif
 }
 
 - (void)removeFromParent {
@@ -401,6 +415,10 @@ static SKAction *_unpauseSoundAction;
     self.isGameOver = YES;
     self.speed = 0;
     [self.backgroundMusicPlayer stop];
+    if (self.autoShootTimer && self.autoShootTimer.isValid) {
+        [self.autoShootTimer invalidate];
+        self.autoShootTimer = NULL;
+    }
 }
 
 - (void)pauseGame {
@@ -428,6 +446,9 @@ static SKAction *_unpauseSoundAction;
         if(self.backgroundMusicPlayer) {
             [self.backgroundMusicPlayer stop];
         }
+
+        // send fullscreen ad always when user paused
+        [[NSNotificationCenter defaultCenter] postNotificationName:SHOW_FULLSCREEN_AD object:self userInfo:@{FULLSCREEN_INTERVAL_KEY: @-1}];
     }
 }
 
@@ -497,19 +518,17 @@ static SKAction *_unpauseSoundAction;
 - (float)getControllerYAxis {
     if(self.gameSettingsController.controller.extendedGamepad) {
         float joystickVal = self.gameSettingsController.controller.extendedGamepad.leftThumbstick.yAxis.value;
-        float dpadVal = self.gameSettingsController.controller.gamepad.dpad.yAxis.value;
+        float dpadVal = self.gameSettingsController.controller.extendedGamepad.dpad.yAxis.value;
         return joystickVal == 0 ? dpadVal : joystickVal;
     }
 
-    if(self.gameSettingsController.controller.gamepad) {
-        return self.gameSettingsController.controller.gamepad.dpad.yAxis.value;
+    if(self.gameSettingsController.controller.extendedGamepad) {
+        return self.gameSettingsController.controller.extendedGamepad.dpad.yAxis.value;
     }
 
-#ifdef TVOS
     if(self.gameSettingsController.controller.microGamepad) {
         return self.gameSettingsController.controller.microGamepad.dpad.yAxis.value;
     }
-#endif
     return 0;
 }
 

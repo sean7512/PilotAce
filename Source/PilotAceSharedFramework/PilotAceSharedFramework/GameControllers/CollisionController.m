@@ -61,7 +61,7 @@ static SKAction *_bulletHitMissileNoExplodeSound;
         dispatch_once(&loadActionSoundsOnceToken, ^{
             _missileExplosionSound = [SKAction playSoundFileNamed:MISSILE_EXPLOSION_SOUND waitForCompletion:NO];
             _bulletObjectHitSound = [SKAction playSoundFileNamed:BULLET_OBJECT_HIT_SOUND waitForCompletion:NO];
-            _planeExplosionSound = _gasCanSound = [SKAction playSoundFileNamed:PLANE_EXPLOSION_SOUND waitForCompletion:NO];
+            _planeExplosionSound = [SKAction playSoundFileNamed:PLANE_EXPLOSION_SOUND waitForCompletion:NO];
             _gasCanSound = [SKAction playSoundFileNamed:GAS_RECEIVED_SOUND waitForCompletion:NO];
             _bulletHitMissileNoExplodeSound = [SKAction playSoundFileNamed:BULLET_HIT_MISSILE_NO_EXPLODE_SOUND waitForCompletion:NO];
         });

@@ -52,29 +52,27 @@
     BOOL hasController = [GameSettingsController sharedInstance].mustUseController || [GameSettingsController sharedInstance].controller;
 
     if(hasController) {
-        if([GameSettingsController sharedInstance].controller.gamepad) {
-            movePlaneInstructions = @"D-Pad";
+        if([GameSettingsController sharedInstance].controller.extendedGamepad) {
+            movePlaneInstructions = @"D-Pad/Joystick";
             shootInstructions = @"Press X Button to Shoot";
-        }
-#ifdef TVOS
-        else if([GameSettingsController sharedInstance].controller.microGamepad) {
+        } else if([GameSettingsController sharedInstance].controller.microGamepad) {
             movePlaneInstructions = @"Touchpad";
             shootInstructions = @"Press Play/Pause Button to Shoot";
-        }
-#endif
-        if([GameSettingsController sharedInstance].controller.extendedGamepad) {
-            movePlaneInstructions = @"Joystick";
         }
     }
 
     // plane movement
+    CGFloat moveWidth = 180*nodeScale;
+    if ([GameSettingsController.sharedInstance isAutoShootEnabled]) {
+        moveWidth = size.width;
+    }
     self.dragBoxNode = [ShapedButton createWithTouchDownInsideEventCallBack:NULL];
     self.dragBoxNode.userInteractionEnabled = NO;
     UIBezierPath *dragBoxOutline = [[UIBezierPath alloc] init];
     [dragBoxOutline moveToPoint:CGPointMake(0, 0)];
     [dragBoxOutline addLineToPoint:CGPointMake(0, size.height)];
-    [dragBoxOutline addLineToPoint:CGPointMake(180*nodeScale, size.height)];
-    [dragBoxOutline addLineToPoint:CGPointMake(180*nodeScale, 0)];
+    [dragBoxOutline addLineToPoint:CGPointMake(moveWidth, size.height)];
+    [dragBoxOutline addLineToPoint:CGPointMake(moveWidth, 0)];
     [dragBoxOutline addLineToPoint:CGPointMake(0, 0)];
     self.dragBoxNode.path = dragBoxOutline.CGPath;
     self.dragBoxNode.lineWidth = 1;
@@ -86,45 +84,47 @@
     SKLabelNode *up = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
     up.fontSize = 40*nodeScale;
     up.text = @"^";
-    up.position = CGPointMake(90*nodeScale, (size.height/2) + 20*nodeScale);
+    up.position = CGPointMake((moveWidth/2), (size.height/2) + 20*nodeScale);
     [self addChild:up];
 
     SKLabelNode *down = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
     down.fontSize = 40*nodeScale;
     down.text = @"v";
-    down.position = CGPointMake(90*nodeScale, (size.height/2) - 50*nodeScale);
+    down.position = CGPointMake((moveWidth/2), (size.height/2) - 50*nodeScale);
     [self addChild:down];
 
     SKLabelNode *drag = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
     drag.fontSize = 20*nodeScale;
     drag.text = movePlaneInstructions;
-    drag.position = CGPointMake(90*nodeScale, (size.height/2));
+    drag.position = CGPointMake((moveWidth/2), (size.height/2));
     [self addChild:drag];
 
     // shooting
-    self.shootBoxNode = [ShapedButton createWithTouchUpInsideCallBack:NULL];
-    self.shootBoxNode.userInteractionEnabled = NO;
-    UIBezierPath *shootBoxOutline = [[UIBezierPath alloc] init];
-    [shootBoxOutline moveToPoint:CGPointMake(180*nodeScale, 0)];
-    [shootBoxOutline addLineToPoint:CGPointMake(180*nodeScale, size.height)];
-    [shootBoxOutline addLineToPoint:CGPointMake(size.width, size.height)];
-    [shootBoxOutline addLineToPoint:CGPointMake(size.width, 0)];
-    [shootBoxOutline addLineToPoint:CGPointMake(180*nodeScale, 0)];
-    self.shootBoxNode.path = shootBoxOutline.CGPath;
-    self.shootBoxNode.lineWidth = 1;
-    self.shootBoxNode.strokeColor = [[SKColor blueColor] colorWithAlphaComponent:0.3];
-    self.shootBoxNode.fillColor = [[SKColor blueColor] colorWithAlphaComponent:0.3];
-    self.shootBoxNode.antialiased = NO;
-    [self addChild:self.shootBoxNode];
+    if (![GameSettingsController.sharedInstance isAutoShootEnabled]) {
+        self.shootBoxNode = [ShapedButton createWithTouchUpInsideCallBack:NULL];
+        self.shootBoxNode.userInteractionEnabled = NO;
+        UIBezierPath *shootBoxOutline = [[UIBezierPath alloc] init];
+        [shootBoxOutline moveToPoint:CGPointMake(180*nodeScale, 0)];
+        [shootBoxOutline addLineToPoint:CGPointMake(180*nodeScale, size.height)];
+        [shootBoxOutline addLineToPoint:CGPointMake(size.width, size.height)];
+        [shootBoxOutline addLineToPoint:CGPointMake(size.width, 0)];
+        [shootBoxOutline addLineToPoint:CGPointMake(180*nodeScale, 0)];
+        self.shootBoxNode.path = shootBoxOutline.CGPath;
+        self.shootBoxNode.lineWidth = 1;
+        self.shootBoxNode.strokeColor = [[SKColor blueColor] colorWithAlphaComponent:0.3];
+        self.shootBoxNode.fillColor = [[SKColor blueColor] colorWithAlphaComponent:0.3];
+        self.shootBoxNode.antialiased = NO;
+        [self addChild:self.shootBoxNode];
 
-    SKLabelNode *shoot = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
-    shoot.fontSize = 20*nodeScale;
-    shoot.text = shootInstructions;
-    shoot.position = CGPointMake((size.width+(130*nodeScale))/2, (size.height/2));
-    [self addChild:shoot];
+        SKLabelNode *shoot = [SKLabelNode labelNodeWithFontNamed:GAME_FONT];
+        shoot.fontSize = 20*nodeScale;
+        shoot.text = shootInstructions;
+        shoot.position = CGPointMake((size.width+(130*nodeScale))/2, (size.height/2));
+        [self addChild:shoot];
+    }
 
 #ifdef TVOS
-    if(hasController && ![GameSettingsController sharedInstance].controller.gamepad) {
+    if(hasController && [GameSettingsController sharedInstance].controller.microGamepad && ![GameSettingsController sharedInstance].controller.extendedGamepad) {
         UIImage *image = [UIImage imageNamed:@"tvOSRemote" inBundle:[NSBundle bundleForClass:[HowToPlayOverlayNode class]] compatibleWithTraitCollection:nil];
         SKSpriteNode *tvosRemote = [[SKSpriteNode alloc] initWithTexture:[SKTexture textureWithImage:image]];
 

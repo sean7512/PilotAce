@@ -19,7 +19,7 @@ static NSString *const PARTICLE_TEXTURE_NAME = @"spark";
 
     // emitter node
     NSString *emitterPath = [bundle pathForResource:resourceName ofType:PARTICLE_FILE_TYPE];
-    SKEmitterNode *emitterNode = [NSKeyedUnarchiver unarchiveObjectWithFile:emitterPath];
+    SKEmitterNode *emitterNode = [NSKeyedUnarchiver unarchivedObjectOfClass:[SKEmitterNode class] fromData:[[NSData alloc] initWithContentsOfFile:emitterPath] error:nil];
 
     // texture for emitter node
     UIImage *particleTexture = [UIImage imageNamed:PARTICLE_TEXTURE_NAME inBundle:bundle compatibleWithTraitCollection:nil];

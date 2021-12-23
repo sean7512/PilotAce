@@ -90,7 +90,7 @@
 
     if([[GameSettingsController sharedInstance].shareDelegate canUseShare]) {
         LabelButton *twitterButton = [LabelButton createWithFontNamed:GAME_FONT withTouchEventCallback:^{
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/PilotAceiOS"]];
+            [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https://twitter.com/PilotAceiOS"] options:@{} completionHandler:nil];
         }];
         twitterButton.text = @"Follow Us on Twitter";
         twitterButton.fontSize = 20*nodeScale;
@@ -107,12 +107,21 @@
     [super setupController:controller];
 
     AboutScene * __weak w_self = self;
-    [controller setControllerPausedHandler:^(GCController * _Nonnull controller) {
-        if(w_self) {
-            SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
-            [w_self.scene.view presentScene: w_self.sceneOrigin transition: reveal];
-        }
-    }];
+    if (controller.extendedGamepad) {
+        [controller.extendedGamepad.buttonMenu setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if(w_self && pressed) {
+                SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
+                [w_self.scene.view presentScene: w_self.sceneOrigin transition: reveal];
+            }
+        }];
+    } else if (controller.microGamepad) {
+        [controller.microGamepad.buttonMenu setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if(w_self && pressed) {
+                SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
+                [w_self.scene.view presentScene: w_self.sceneOrigin transition: reveal];
+            }
+        }];
+    }
 }
 
 - (void)positionNode:(SKNode *)node atLeftEdge:(CGFloat)xPos atYPos:(CGFloat)yPos {

@@ -115,23 +115,19 @@ static float const VALUE_CHANGE_THRESHOLD = 0.5;
     GCController *controller = [GameSettingsController sharedInstance].controller;
 
     // all extended controllers also support gamepad, ignore extended
-    if (controller && controller.gamepad) {
-        [controller.gamepad.buttonX setPressedChangedHandler:NULL];
-        [controller.gamepad.buttonA setPressedChangedHandler:NULL];
-        [controller.gamepad.dpad setValueChangedHandler:NULL];
-        [controller setControllerPausedHandler:NULL];
+    if (controller && controller.extendedGamepad) {
+        [controller.extendedGamepad.buttonX setPressedChangedHandler:NULL];
+        [controller.extendedGamepad.buttonA setPressedChangedHandler:NULL];
+        [controller.extendedGamepad.dpad setValueChangedHandler:NULL];
+        [controller.extendedGamepad.leftThumbstick setValueChangedHandler:NULL];
+        [controller.extendedGamepad.buttonMenu setValueChangedHandler:NULL];
     }
-#ifdef TVOS
-    else if (controller && controller.microGamepad) {
+
+    if (controller && controller.microGamepad) {
         [controller.microGamepad.buttonX setPressedChangedHandler:NULL];
         [controller.microGamepad.buttonA setPressedChangedHandler:NULL];
         [controller.microGamepad.dpad setValueChangedHandler:NULL];
-        [controller setControllerPausedHandler:NULL];
-    }
-#endif
-    
-    if (controller && controller.extendedGamepad) {
-        [controller.extendedGamepad.leftThumbstick setValueChangedHandler:NULL];
+        [controller.microGamepad.buttonMenu setValueChangedHandler:NULL];
     }
 }
 
@@ -154,30 +150,31 @@ static float const VALUE_CHANGE_THRESHOLD = 0.5;
 
     GCController *controller = [GameSettingsController sharedInstance].controller;
 
-    if(controller) {
-        [controller setControllerPausedHandler:^(GCController * _Nonnull controller) {
-            [w_self cleanupControllerHandlers];
-            [w_self.pauseGameController resumeGame];
-        }];
-    }
-
     // handles gamepad or extended gamepad (all extended gamepads support gamepad)
-    if (controller && controller.gamepad) {
-        [controller.gamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+    if (controller && controller.extendedGamepad) {
+        [controller.extendedGamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonXChanged:button withValue:value isPressed:pressed];
         }];
 
-        [controller.gamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+        [controller.extendedGamepad.buttonA setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
             [w_self buttonAChanged:button withValue:value isPressed:pressed];
         }];
 
-        [controller.gamepad.dpad setValueChangedHandler:^(GCControllerDirectionPad *dpad, float xValue, float yValue) {
+        [controller.extendedGamepad.dpad setValueChangedHandler:^(GCControllerDirectionPad *dpad, float xValue, float yValue) {
             [w_self dpadChanged:dpad withXValue:xValue withYValue:yValue];
         }];
-    }
-#ifdef TVOS
-    // ensure we have a micropad
-    else if (controller && controller.microGamepad) {
+
+        [controller.extendedGamepad.leftThumbstick setValueChangedHandler:^(GCControllerDirectionPad *joystick, float xValue, float yValue) {
+            [w_self dpadChanged:joystick withXValue:xValue withYValue:yValue];
+        }];
+
+        [controller.extendedGamepad.buttonMenu setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if (pressed) {
+                [w_self cleanupControllerHandlers];
+                [w_self.pauseGameController resumeGame];
+            }
+        }];
+    } else if (controller && controller.microGamepad) {
         controller.microGamepad.reportsAbsoluteDpadValues = NO;
 
         [controller.microGamepad.buttonX setPressedChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
@@ -191,12 +188,12 @@ static float const VALUE_CHANGE_THRESHOLD = 0.5;
         [controller.microGamepad.dpad setValueChangedHandler:^(GCControllerDirectionPad *dpad, float xValue, float yValue) {
             [w_self dpadChanged:dpad withXValue:xValue withYValue:yValue];
         }];
-    }
-#endif
 
-    if (controller && controller.extendedGamepad) {
-        [controller.extendedGamepad.leftThumbstick setValueChangedHandler:^(GCControllerDirectionPad *joystick, float xValue, float yValue) {
-            [w_self dpadChanged:joystick withXValue:xValue withYValue:yValue];
+        [controller.microGamepad.buttonMenu setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if (pressed) {
+                [w_self cleanupControllerHandlers];
+                [w_self.pauseGameController resumeGame];
+            }
         }];
     }
 }

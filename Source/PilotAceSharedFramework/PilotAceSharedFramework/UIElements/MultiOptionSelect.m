@@ -52,7 +52,7 @@ static const CGFloat PADDING = 10;
 #ifndef TVOS
                 if(w_self.optionSelectMode == SlideOutOptionSelect) {
 #else
-                if(NO) {
+                    if(/* DISABLES CODE */ (NO)) {
 #endif
                     [w_self.selectedOptionLabel removeFromParent];
                     [w_self addChild:w_self.optionButtons];

@@ -71,37 +71,36 @@ static NSString *const OSPREY_ACHIEVEMENT_ID = @"pilot_ace_osprey";
 - (void)getHighScoreForPlayer:(GKPlayer *)player forDifficultyLevel:(DifficultyLevel *)difficulty {
     NSString *leaderboardId = [difficulty keyWithSuffix:TOTAL_DISTANCE_LEADERBOARD_ID];
 
-    GKLeaderboard *leaderBoardRequest = [[GKLeaderboard alloc] initWithPlayers:@[player]];
-    leaderBoardRequest.identifier = leaderboardId;
-    [leaderBoardRequest loadScoresWithCompletionHandler:^(NSArray *scores, NSError *error) {
+
+
+    [GKLeaderboard loadLeaderboardsWithIDs:@[leaderboardId] completionHandler:^(NSArray<GKLeaderboard *> * _Nullable leaderboards, NSError * _Nullable error) {
         if(error) {
             NSLog(@"An error ocucurred while loading the local player's Game Center highscore: %@", error);
             return;
         }
 
-        // should only get 0 or 1 score (depends if user was previously logged in)
-        int64_t remoteHighScore = 0;
-        if(scores && scores.count > 0) {
-            NSAssert(scores.count == 1, @"Only expected to get 1 score when loading local player's highscore: %lu", (unsigned long)scores.count);
-            GKScore *score = scores[0];
+        if (leaderboardId && leaderboards.count > 0) {
+            [leaderboards[0] loadEntriesForPlayers:@[player] timeScope:GKLeaderboardTimeScopeAllTime completionHandler:^(GKLeaderboardEntry * _Nullable_result localPlayerEntry, NSArray<GKLeaderboardEntry *> * _Nullable entries, NSError * _Nullable error) {
+                if(error) {
+                    NSLog(@"An error ocucurred while loading the local player's Game Center highscore: %@", error);
+                    return;
+                }
 
-            // score should be for requested leaderboard
-            NSAssert([leaderboardId isEqualToString:score.leaderboardIdentifier], @"The highscore received was not for the correct leaderboard: %@", score.leaderboardIdentifier);
+                // should only get 0 or 1 score (depends if user was previously logged in)
+                int64_t remoteHighScore = 0;
+                if (entries && entries.count > 0) {
+                    remoteHighScore = entries[0].score;
+                }
 
-            remoteHighScore = score.value;
+                // sync device score with GC
+                [[GameSettingsController sharedInstance] syncWithRemoteHighScore:remoteHighScore forPlayerId:player.teamPlayerID forDifficultyLevel:difficulty];
+            }];
         }
-
-        // sync device score with GC
-        [[GameSettingsController sharedInstance] syncWithRemoteHighScore:remoteHighScore forPlayerId:player.playerID forDifficultyLevel:difficulty];
     }];
 }
 
 - (void)reportNewTotalScore:(int64_t)newScore forDifficulty:(DifficultyLevel *)difficulty {
-    GKScore *gkNewScore = [[GKScore alloc] initWithLeaderboardIdentifier: [difficulty keyWithSuffix:TOTAL_DISTANCE_LEADERBOARD_ID]];
-    gkNewScore.value = newScore;
-    gkNewScore.context = 0;
-
-    [GKScore reportScores:@[gkNewScore] withCompletionHandler:^(NSError *error) {
+    [GKLeaderboard submitScore:newScore context:0 player: GKLocalPlayer.local leaderboardIDs: @[[difficulty keyWithSuffix:TOTAL_DISTANCE_LEADERBOARD_ID]] completionHandler:^(NSError * _Nullable error) {
         if(error) {
             NSLog(@"An error occurred reporting the score to Game Center: %@", error);
         }
@@ -223,12 +222,9 @@ static NSString *const OSPREY_ACHIEVEMENT_ID = @"pilot_ace_osprey";
 }
 
 - (void)displayLeaderBoardWithViewController:(UIViewController *)viewController {
-    GKGameCenterViewController *leaderboardController = [GKGameCenterViewController new];
-#ifndef TVOS
-    leaderboardController.viewState = GKGameCenterViewControllerStateLeaderboards;
-#endif
+    GKGameCenterViewController *leaderboardController = [[GKGameCenterViewController alloc] initWithState: GKGameCenterViewControllerStateLeaderboards];
     leaderboardController.gameCenterDelegate = self;
-    leaderboardController.modalInPopover = YES;
+    leaderboardController.modalInPresentation = YES;
     leaderboardController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
 
     [viewController presentViewController:leaderboardController animated:YES completion:NULL];

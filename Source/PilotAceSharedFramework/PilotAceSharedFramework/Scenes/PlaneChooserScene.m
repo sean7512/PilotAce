@@ -82,12 +82,21 @@
     [super setupController:controller];
 
     PlaneChooserScene * __weak w_self = self;
-    [controller setControllerPausedHandler:^(GCController * _Nonnull controller) {
-        if(w_self) {
-            SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
-            [w_self.scene.view presentScene: w_self.previousScene transition: reveal];
-        }
-    }];
+    if (controller.extendedGamepad) {
+        [controller.extendedGamepad.buttonMenu setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if(w_self && pressed) {
+                SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
+                [w_self.scene.view presentScene: w_self.previousScene transition: reveal];
+            }
+        }];
+    } else if (controller.microGamepad) {
+        [controller.microGamepad.buttonMenu setValueChangedHandler:^(GCControllerButtonInput *button, float value, BOOL pressed) {
+            if(w_self && pressed) {
+                SKTransition *reveal = [SKTransition pushWithDirection:SKTransitionDirectionRight duration:0.7];
+                [w_self.scene.view presentScene: w_self.previousScene transition: reveal];
+            }
+        }];
+    }
 }
 
 - (void)handlePanFrom:(UIPanGestureRecognizer *)recognizer {
@@ -144,6 +153,8 @@ CGPoint mult(const CGPoint v, const CGFloat s) {
 }
 
 - (void)populateScreen {
+    [[NSNotificationCenter defaultCenter] postNotificationName:HIDE_BANNER_AD object:self userInfo:nil];
+
     self.physicsWorld.gravity = CGVectorMake(0, 0);
     CGFloat nodeScale = [[GameSettingsController sharedInstance].nodeScaleDelegate getNodeScaleSize];
 
